@@ -1,0 +1,35 @@
+---
+- hosts: corporativo
+  remote_user: root
+  tasks:
+   - name: "Cria dir Node Export"
+     file:
+      path: /opt/node
+      state: directory
+   - name: "Download node export"
+     get_url:
+       url: https://github.com/prometheus/node_exporter/releases/download/v0.18.1/node_exporter-0.18.1.linux-amd64.tar.gz
+       dest: /opt/
+   - name: "Extrai dados "
+     unarchive:
+       remote_src: yes
+       src: /opt/node_exporter-0.18.1.linux-amd64.tar.gz
+       dest: /opt/node
+   - name: "Move foo to bar"
+     command: mv  /opt/node/node_exporter-0.18.1.linux-amd64/node_exporter  /opt/node/node_exporter
+   - name: "Apaga arquivos nao usados"
+     command: rm -rf /opt/node/node_exporter-0.18.1.linux-amd64 /opt/node_exporter-0.18.1.linux-amd64.tar.gz
+   - name: "install unit file to systemd"
+     template:
+      src: node_exp.service
+      dest: /etc/systemd/system/node_exp.service
+   - name: configure systemd to use service
+     systemd:
+       daemon_reload: yes
+       enabled: yes
+       state: started
+       name: node_exp.service
+   - name: Enable service httpd, and not touch the state
+     service:
+       name: node_exp
+       enabled: yes
