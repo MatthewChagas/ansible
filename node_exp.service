@@ -1,0 +1,13 @@
+[Unit]
+Description=node_exp metrics hardware
+After=network.target
+
+[Service]
+Type=simple
+User=root
+ExecStart=/opt/node/node_exporter
+Restart=on-abort
+
+
+[Install]
+WantedBy=multi-user.target
